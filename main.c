@@ -7,6 +7,31 @@ typedef struct {
   int end;
 } Range;
 
+void add(int *target, int a, int b, char *operator) {
+  *operator = '+';
+  *target = a + b;
+}
+
+void subtract(int *target, int a, int b, char *operator) {
+  *operator = '-';
+  *target = a - b;
+}
+
+void multiply(int *target, int a, int b, char *operator) {
+  *operator = '*';
+  *target = a * b;
+}
+
+void divide(int *target, int a, int b, char *operator) {
+  *operator = '/';
+  *target = a / b;
+}
+
+void modulo(int *target, int a, int b, char *operator) {
+  *operator = '%';
+  *target = a % b;
+}
+
 int main() {
   Range range;
   char shortCodeMode;
@@ -14,8 +39,14 @@ int main() {
   char codePath[256];
   FILE *codeFile;
   char elsePart[6];
-  int i;
+  void (*calculator[])(int *, int, int, char *) = {
+    add, subtract, multiply, divide, modulo
+  };
+  char operator;
+  int calculationResult;
+  unsigned int i;
   int j;
+  int k;
 
   printf("Enter the range of numbers to be able to be calculated by splitting "
          "them with space\n");
@@ -67,51 +98,36 @@ int main() {
     fprintf(codeFile, "\n");
   }
 
-  // Addition
-  if (isShortCodeModeEnabled) {
-    for (i = range.start; i <= range.end; i++) {
+  for (i = 0; i < 5; i++) {
+    if (isShortCodeModeEnabled) {
       for (j = range.start; j <= range.end; j++) {
-        fprintf(codeFile, "if(n==%d&&m==%d)printf(\"%d\\n\");", i, j, i + j);
-      }
-    }
-  } else {
-    elsePart[0] = '\0';
-    for (i = range.start; i <= range.end; i++) {
-      for (j = range.start; j <= range.end; j++) {
-        fprintf(codeFile, "  %sif (n == %d && m == %d) {\n", elsePart, i, j);
-        fprintf(codeFile, "    printf(\"%d\\n\");\n", i + j);
-        fprintf(codeFile, "  }\n");
-        fprintf(codeFile, "\n");
+        for (k = range.start; k <= range.end; k++) {
+          (*calculator[i])(&calculationResult, j, k, &operator);
 
-        if (elsePart[0] == '\0') {
-          strcpy(elsePart, "else ");
+          fprintf(codeFile,
+                  "if(n==%d&&m==%d)printf(\"%d %c %d = %d\\n\");",
+                  j, k, j, operator, k, calculationResult
+          );
         }
       }
-    }
-  }
+    } else {
+      elsePart[0] = '\0';
 
-  // Subtraction
-  if (isShortCodeModeEnabled) {
-    for (i = range.start; i <= range.end; i++) {
       for (j = range.start; j <= range.end; j++) {
-        fprintf(codeFile, "if(n==%d&&m==%d)printf(\"%d\\n\");", i, j, i - j);
+        for (k = range.start; k <= range.end; k++) {
+          (*calculator[i])(&calculationResult, j, k, &operator);
 
-        if (elsePart[0] == '\0') {
-          strcpy(elsePart, "else ");
-        }
-      }
-    }
-  } else {
-    elsePart[0] = '\0';
-    for (i = range.start; i <= range.end; i++) {
-      for (j = range.start; j <= range.end; j++) {
-        fprintf(codeFile, "  %sif (n == %d && m == %d) {\n", elsePart, i, j);
-        fprintf(codeFile, "    printf(\"%d\\n\");\n", i - j);
-        fprintf(codeFile, "  }\n");
-        fprintf(codeFile, "\n");
+          fprintf(codeFile, "  %sif (n == %d && m == %d) {\n", elsePart, j, k);
+          fprintf(codeFile,
+                  "    printf(\"%d %c %d = %d\\n\");\n",
+                  j, operator, k, calculationResult
+          );
+          fprintf(codeFile, "  }\n");
+          fprintf(codeFile, "\n");
 
-        if (elsePart[0] == '\0') {
-          strcpy(elsePart, "else ");
+          if (elsePart[0] == '\0') {
+            strcpy(elsePart, "else ");
+          }
         }
       }
     }
@@ -124,6 +140,8 @@ int main() {
     fprintf(codeFile, "}\n");
     fprintf(codeFile, "\n");
   }
+
+  fclose(codeFile);
 
   return 0;
 }
