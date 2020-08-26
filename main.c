@@ -13,28 +13,28 @@ typedef enum {
 } CalculationError;
 
 CalculationError add(int *target, int a, int b, char *operator) {
-  *operator = '+';
+  strcpy(operator, "+");
   *target = a + b;
 
   return SUCCESS;
 }
 
 CalculationError subtract(int *target, int a, int b, char *operator) {
-  *operator = '-';
+  strcpy(operator, "-");
   *target = a - b;
 
   return SUCCESS;
 }
 
 CalculationError multiply(int *target, int a, int b, char *operator) {
-  *operator = '*';
+  strcpy(operator, "*");
   *target = a * b;
 
   return SUCCESS;
 }
 
 CalculationError divide(int *target, int a, int b, char *operator) {
-  *operator = '/';
+  strcpy(operator, "/");
 
   if (b == 0) {
     return UNDEFINED;
@@ -46,7 +46,7 @@ CalculationError divide(int *target, int a, int b, char *operator) {
 }
 
 CalculationError modulo(int *target, int a, int b, char *operator) {
-  *operator = '%';
+  strcpy(operator, "%%");
 
   if (b == 0) {
     return UNDEFINED;
@@ -67,7 +67,7 @@ int main() {
   CalculationError (*calculator[])(int *, int, int, char *) = {
     add, subtract, multiply, divide, modulo
   };
-  char operator;
+  char operator[3];
   int calculationResult;
   CalculationError calculationError;
   unsigned int i;
@@ -128,10 +128,10 @@ int main() {
     if (isShortCodeModeEnabled) {
       for (j = range.start; j <= range.end; j++) {
         for (k = range.start; k <= range.end; k++) {
-          calculationError = (*calculator[i])(&calculationResult, j, k, &operator);
+          calculationError = (*calculator[i])(&calculationResult, j, k, operator);
 
           fprintf(codeFile,
-                  "if(n==%d&&m==%d)printf(\"%d %c %d = ",
+                  "if(n==%d&&m==%d)printf(\"%d %s %d = ",
                   j, k, j, operator, k
           );
 
@@ -153,12 +153,12 @@ int main() {
 
       for (j = range.start; j <= range.end; j++) {
         for (k = range.start; k <= range.end; k++) {
-          calculationError = (*calculator[i])(&calculationResult, j, k, &operator);
+          calculationError = (*calculator[i])(&calculationResult, j, k, operator);
 
           fprintf(codeFile, "  %sif (n == %d && m == %d) {\n", elsePart, j, k);
 
           fprintf(codeFile,
-                  "    printf(\"%d %c %d = ",
+                  "    printf(\"%d %s %d = ",
                   j, operator, k
           );
 
