@@ -95,6 +95,34 @@ int main() {
     }
   }
 
+  // Subtraction
+  elsePart[0] = '\0';
+  if (isShortCodeModeEnabled) {
+    for (i = range.start; i <= range.end; i++) {
+      for (j = range.start; j <= range.end; j++) {
+        fprintf(codeFile, "%sif(n==%d&&m==%d)printf(\"%d\\n\");",
+          elsePart, i, j, i - j);
+
+        if (elsePart[0] == '\0') {
+          strcpy(elsePart, "else ");
+        }
+      }
+    }
+  } else {
+    for (i = range.start; i <= range.end; i++) {
+      for (j = range.start; j <= range.end; j++) {
+        fprintf(codeFile, "  %sif (n == %d && m == %d) {\n", elsePart, i, j);
+        fprintf(codeFile, "    printf(\"%d\\n\");\n", i - j);
+        fprintf(codeFile, "  }\n");
+        fprintf(codeFile, "\n");
+
+        if (elsePart[0] == '\0') {
+          strcpy(elsePart, "else ");
+        }
+      }
+    }
+  }
+
   if (isShortCodeModeEnabled) {
     fprintf(codeFile, "return 0;}");
   } else {
