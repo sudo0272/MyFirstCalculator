@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 typedef struct {
   int start;
@@ -12,6 +13,7 @@ int main() {
   bool isShortCodeModeEnabled;
   char codePath[256];
   FILE *codeFile;
+  char elsePart[6];
   int i;
   int j;
 
@@ -66,19 +68,29 @@ int main() {
   }
 
   // Addition
+  elsePart[0] = '\0';
   if (isShortCodeModeEnabled) {
     for (i = range.start; i <= range.end; i++) {
       for (j = range.start; j <= range.end; j++) {
-        fprintf(codeFile, "if(n==%d&&m==%d)printf(\"%d\\n\");", i, j, i + j);
+        fprintf(codeFile, "%sif(n==%d&&m==%d)printf(\"%d\\n\");",
+          elsePart, i, j, i + j);
+
+        if (elsePart[0] == '\0') {
+          strcpy(elsePart, "else ");
+        }
       }
     }
   } else {
     for (i = range.start; i <= range.end; i++) {
       for (j = range.start; j <= range.end; j++) {
-        fprintf(codeFile, "  if (n == %d && m == %d) {\n", i, j);
+        fprintf(codeFile, "  %sif (n == %d && m == %d) {\n", elsePart, i, j);
         fprintf(codeFile, "    printf(\"%d\\n\");\n", i + j);
         fprintf(codeFile, "  }\n");
         fprintf(codeFile, "\n");
+
+        if (elsePart[0] == '\0') {
+          strcpy(elsePart, "else ");
+        }
       }
     }
   }
