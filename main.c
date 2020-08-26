@@ -7,29 +7,54 @@ typedef struct {
   int end;
 } Range;
 
-void add(int *target, int a, int b, char *operator) {
+typedef enum {
+  SUCCESS,
+  UNDEFINED
+} CalculationError;
+
+CalculationError add(int *target, int a, int b, char *operator) {
   *operator = '+';
   *target = a + b;
+
+  return SUCCESS;
 }
 
-void subtract(int *target, int a, int b, char *operator) {
+CalculationError subtract(int *target, int a, int b, char *operator) {
   *operator = '-';
   *target = a - b;
+
+  return SUCCESS;
 }
 
-void multiply(int *target, int a, int b, char *operator) {
+CalculationError multiply(int *target, int a, int b, char *operator) {
   *operator = '*';
   *target = a * b;
+
+  return SUCCESS;
 }
 
-void divide(int *target, int a, int b, char *operator) {
+CalculationError divide(int *target, int a, int b, char *operator) {
   *operator = '/';
+
+  if (b == 0) {
+    return UNDEFINED;
+  }
+
   *target = a / b;
+  
+  return SUCCESS;
 }
 
-void modulo(int *target, int a, int b, char *operator) {
+CalculationError modulo(int *target, int a, int b, char *operator) {
   *operator = '%';
+
+  if (b == 0) {
+    return UNDEFINED;
+  }
+
   *target = a % b;
+
+  return SUCCESS;
 }
 
 int main() {
@@ -39,11 +64,12 @@ int main() {
   char codePath[256];
   FILE *codeFile;
   char elsePart[6];
-  void (*calculator[])(int *, int, int, char *) = {
+  CalculationError (*calculator[])(int *, int, int, char *) = {
     add, subtract, multiply, divide, modulo
   };
   char operator;
   int calculationResult;
+  CalculationError calculationError;
   unsigned int i;
   int j;
   int k;
@@ -102,12 +128,24 @@ int main() {
     if (isShortCodeModeEnabled) {
       for (j = range.start; j <= range.end; j++) {
         for (k = range.start; k <= range.end; k++) {
-          (*calculator[i])(&calculationResult, j, k, &operator);
+          calculationError = (*calculator[i])(&calculationResult, j, k, &operator);
 
           fprintf(codeFile,
-                  "if(n==%d&&m==%d)printf(\"%d %c %d = %d\\n\");",
-                  j, k, j, operator, k, calculationResult
+                  "if(n==%d&&m==%d)printf(\"%d %c %d = ",
+                  j, k, j, operator, k
           );
+
+          switch (calculationError) {
+            case SUCCESS:
+              fprintf(codeFile, "%d", calculationResult);
+              break;
+
+            case UNDEFINED:
+              fprintf(codeFile, "UNDEFINED");
+              break;
+          }
+
+          fprintf(codeFile, " \\n\");");
         }
       }
     } else {
@@ -115,13 +153,27 @@ int main() {
 
       for (j = range.start; j <= range.end; j++) {
         for (k = range.start; k <= range.end; k++) {
-          (*calculator[i])(&calculationResult, j, k, &operator);
+          calculationError = (*calculator[i])(&calculationResult, j, k, &operator);
 
           fprintf(codeFile, "  %sif (n == %d && m == %d) {\n", elsePart, j, k);
+
           fprintf(codeFile,
-                  "    printf(\"%d %c %d = %d\\n\");\n",
-                  j, operator, k, calculationResult
+                  "    printf(\"%d %c %d = ",
+                  j, operator, k
           );
+
+          switch (calculationError) {
+            case SUCCESS:
+              fprintf(codeFile, "%d", calculationResult);
+              break;
+
+            case UNDEFINED:
+              fprintf(codeFile, "UNDEFINED");
+              break;
+          }
+
+          fprintf(codeFile, "\\n\");\n");
+
           fprintf(codeFile, "  }\n");
           fprintf(codeFile, "\n");
 
