@@ -68,19 +68,14 @@ int main() {
   }
 
   // Addition
-  elsePart[0] = '\0';
   if (isShortCodeModeEnabled) {
     for (i = range.start; i <= range.end; i++) {
       for (j = range.start; j <= range.end; j++) {
-        fprintf(codeFile, "%sif(n==%d&&m==%d)printf(\"%d\\n\");",
-          elsePart, i, j, i + j);
-
-        if (elsePart[0] == '\0') {
-          strcpy(elsePart, "else ");
-        }
+        fprintf(codeFile, "if(n==%d&&m==%d)printf(\"%d\\n\");", i, j, i + j);
       }
     }
   } else {
+    elsePart[0] = '\0';
     for (i = range.start; i <= range.end; i++) {
       for (j = range.start; j <= range.end; j++) {
         fprintf(codeFile, "  %sif (n == %d && m == %d) {\n", elsePart, i, j);
@@ -96,12 +91,10 @@ int main() {
   }
 
   // Subtraction
-  elsePart[0] = '\0';
   if (isShortCodeModeEnabled) {
     for (i = range.start; i <= range.end; i++) {
       for (j = range.start; j <= range.end; j++) {
-        fprintf(codeFile, "%sif(n==%d&&m==%d)printf(\"%d\\n\");",
-          elsePart, i, j, i - j);
+        fprintf(codeFile, "if(n==%d&&m==%d)printf(\"%d\\n\");", i, j, i - j);
 
         if (elsePart[0] == '\0') {
           strcpy(elsePart, "else ");
@@ -109,6 +102,7 @@ int main() {
       }
     }
   } else {
+    elsePart[0] = '\0';
     for (i = range.start; i <= range.end; i++) {
       for (j = range.start; j <= range.end; j++) {
         fprintf(codeFile, "  %sif (n == %d && m == %d) {\n", elsePart, i, j);
